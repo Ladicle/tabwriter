@@ -194,6 +194,10 @@ const (
 	Debug
 )
 
+const (
+	ANSIEscapeHex = '\x1b'
+)
+
 // A Writer must be initialized with a call to Init. The first parameter (output)
 // specifies the filter output. The remaining parameters control the formatting:
 //
@@ -433,6 +437,8 @@ const Escape = '\xff'
 // Start escaped mode.
 func (b *Writer) startEscape(ch byte) {
 	switch ch {
+	case ANSIEscapeHex:
+		b.endChar = 'm'
 	case Escape:
 		b.endChar = Escape
 	case '<':
@@ -454,6 +460,7 @@ func (b *Writer) endEscape() {
 		if b.flags&StripEscape == 0 {
 			b.cell.width -= 2 // don't count the Escape chars
 		}
+	case 'm': // don't count ANSI escape codes
 	case '>': // tag of zero width
 	case ';':
 		b.cell.width++ // entity, count as one rune
@@ -558,6 +565,13 @@ func (b *Writer) Write(buf []byte) (n int, err error) {
 						}
 					}
 				}
+
+			case ANSIEscapeHex:
+				// start of ANSI escaped sequence
+				b.append(buf[n:i])
+				b.updateWidth()
+				n = i
+				b.startEscape(ANSIEscapeHex)
 
 			case Escape:
 				// start of escaped sequence

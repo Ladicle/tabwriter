@@ -10,7 +10,8 @@ import (
 	"io"
 	"io/ioutil"
 	"testing"
-	. "text/tabwriter"
+
+	. "github.com/Ladicle/tabwriter"
 )
 
 type buffer struct {
@@ -168,6 +169,13 @@ var tests = []struct {
 		8, 0, 1, '.', 0,
 		"abc\xff\tdef", // unterminated escape
 		"abc\xff\tdef",
+	},
+
+	{
+		"1e ansi esc",
+		8, 0, 1, '.', 0,
+		"abc\t\x1b[32mdef\x1b[0m\tghi",
+		"abc.....\x1b[32mdef\x1b[0m.....ghi",
 	},
 
 	{

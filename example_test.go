@@ -7,7 +7,8 @@ package tabwriter_test
 import (
 	"fmt"
 	"os"
-	"text/tabwriter"
+
+	"github.com/Ladicle/tabwriter"
 )
 
 func ExampleWriter_Init() {
@@ -70,4 +71,18 @@ func Example_trailingTab() {
 	// -----aa|-----bb|---aligned|
 	// ----aaa|----bbb|unaligned
 	// ---aaaa|---bbbb|---aligned|
+}
+
+func Example_ANSIcolor() {
+	// Observe the text with ANSI color
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, "a\t\x1b[32mb\x1b[0m\tc")    // hex
+	fmt.Fprintln(w, "\033[31maa\033[0m\tbb\tcc") // oct
+	fmt.Fprintln(w, "aaaa\tdddd\teeee")
+	w.Flush()
+
+	// outpu t:
+	// a    |b    |c
+	// aa   |bb   |cc
+	// aaaa |dddd |eeee
 }
